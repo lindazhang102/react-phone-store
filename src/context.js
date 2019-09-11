@@ -9,7 +9,12 @@ class ProductProvider extends Component {
     state = {
         products: [],
         detailProduct: detailProduct,
-        cart:[]
+        cart:[],
+        modalOpen: true,
+        modalProduct: detailProduct,
+        cartSubTotal: 0,
+        cartTax: 0,
+        cartTotal: 0
     }
     componentDidMount(){
         this.setProducts();
@@ -35,7 +40,18 @@ class ProductProvider extends Component {
         })
     }
     addToCart = id => {
-        console.log(`hello from add to cart.id is ${id}`);
+        let tempProducts = [...this.state.products];
+        const index = tempProducts.indexOf(this.getItem(id));
+        const product = tempProducts[index];
+        product.inCart = true;
+        product.count++;
+        const price = product.price;
+        product.total = price;
+        this.setState(()=>{
+            return { products:tempProducts, cart:[...this.state.cart,product] };
+        },()=>{
+            console.log(this.state);
+        })
     }
     tester = () =>{
         console.log('state products:', this.state.products[0].inCart);
@@ -49,9 +65,32 @@ class ProductProvider extends Component {
             }
         })
     }
+    openModal = id =>{
+        const product = this.getItem(id);
+        this.setState(()=>{
+            return { modalProduct:product, modalOpen:true };
+        })
+    }
+    closeModal = () =>{
+        this.setState(()=>{
+            return { modalOpen:false };
+        })
+    }
+    increment = id => {
+        console.log("this is increment method");
+    }
+    decrement = id => {
+        console.log("this is decrement method");
+    }
+    removeItem = id => {
+        console.log("item remove");
+    }
+    clearCart = () => {
+        console.log("cart was cleared");
+    }
     render() {
         return (
-            <ProductContext.Provider value={{...this.state,handleDetail:this.handleDetail,addToCart:this.addToCart}}>
+            <ProductContext.Provider value={{...this.state, handleDetail:this.handleDetail,addToCart:this.addToCart, openModal:this.openModal, closeModal:this.closeModal, increment:this.increment, decrement:this.decrement, removeItem:this.removeItem, clearCart:this.clearCart}}>
                 {/* <button onClick={this.tester}>test me</button> */}
                 {this.props.children}
             </ProductContext.Provider>
